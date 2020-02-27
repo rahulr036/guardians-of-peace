@@ -1,0 +1,62 @@
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+
+        maven {
+            url "https://mvnrepository.com/artifact/com.google.actions/actions-on-google"
+        }
+
+        mavenCentral()
+        mavenLocal()
+        jcenter()
+    }
+    dependencies {
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:2.2.2.RELEASE"
+        classpath "io.spring.gradle:dependency-management-plugin:1.0.9.RELEASE"
+
+
+    }
+}
+
+apply plugin: "org.springframework.boot"
+apply plugin: "io.spring.dependency-management"
+apply plugin: 'java'
+
+group = 'com.guardians'
+version = '1.0.0-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    jcenter()
+
+    maven {
+        url "https://mvnrepository.com/artifact/com.google.actions/actions-on-google"
+    }
+}
+
+dependencies {
+    compile group: 'javax.ws.rs', name: 'javax.ws.rs-api', version: '2.0.1'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
+    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile 'com.jayway.restassured:rest-assured:2.4.0'
+    compile 'com.google.actions:actions-on-google:1.8.0'
+
+
+
+    implementation 'org.springframework.boot:spring-boot-starter-jersey'
+    compile 'junit:junit:3.8.2'
+
+
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    testImplementation 'org.springframework.security:spring-security-test'
+}
+
+test {
+    useJUnitPlatform()
+}
