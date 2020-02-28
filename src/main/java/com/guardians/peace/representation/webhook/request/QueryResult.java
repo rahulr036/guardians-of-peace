@@ -2,15 +2,19 @@ package com.guardians.peace.representation.webhook.request;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.guardians.peace.representation.webhook.OutputContexts;
-import com.guardians.peace.representation.webhook.Parameters;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class QueryResult {
 
     private String queryText;
 
-    private Parameters parameters;
+    private Map<String, List<String>> parameters = new HashMap<>();
 
     private boolean allRequiredParamsPresent;
 
@@ -22,7 +26,7 @@ public class QueryResult {
 
     private Intent intent;
 
-    private Integer intentDetectionConfidence;
+    private BigDecimal intentDetectionConfidence;
 
     private DiagnosticInfo diagnosticInfo;
 
@@ -36,11 +40,15 @@ public class QueryResult {
         this.queryText = queryText;
     }
 
-    public Parameters getParameters() {
+    public Map getParameters() {
         return parameters;
     }
 
-    public void setParameters(Parameters parameters) {
+    public void setParameters(Map parameters) {
+        if (parameters == null) {
+            this.parameters = new HashMap<>();
+            return;
+        }
         this.parameters = parameters;
     }
 
@@ -60,11 +68,11 @@ public class QueryResult {
         this.fulfillmentText = fulfillmentText;
     }
 
-    public Integer getIntentDetectionConfidence() {
+    public BigDecimal getIntentDetectionConfidence() {
         return intentDetectionConfidence;
     }
 
-    public void setIntentDetectionConfidence(Integer intentDetectionConfidence) {
+    public void setIntentDetectionConfidence(BigDecimal intentDetectionConfidence) {
         this.intentDetectionConfidence = intentDetectionConfidence;
     }
 
@@ -115,13 +123,13 @@ public class QueryResult {
 
     public static final class QueryResultBuilder {
         private String queryText;
-        private Parameters parameters;
+        private Map parameters;
         private boolean allRequiredParamsPresent;
         private String fulfillmentText;
         private FulfillmentMessages[] fulfillmentMessages;
         private OutputContexts[] outputContexts;
         private Intent intent;
-        private Integer intentDetectionConfidence;
+        private BigDecimal intentDetectionConfidence;
         private DiagnosticInfo diagnosticInfo;
         private String languageCode;
 
@@ -137,7 +145,7 @@ public class QueryResult {
             return this;
         }
 
-        public QueryResultBuilder withParameters(Parameters parameters) {
+        public QueryResultBuilder withParameters(Map parameters) {
             this.parameters = parameters;
             return this;
         }
@@ -167,7 +175,7 @@ public class QueryResult {
             return this;
         }
 
-        public QueryResultBuilder withIntentDetectionConfidence(Integer intentDetectionConfidence) {
+        public QueryResultBuilder withIntentDetectionConfidence(BigDecimal intentDetectionConfidence) {
             this.intentDetectionConfidence = intentDetectionConfidence;
             return this;
         }

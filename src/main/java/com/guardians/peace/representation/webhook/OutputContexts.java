@@ -3,6 +3,10 @@ package com.guardians.peace.representation.webhook;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class OutputContexts {
 
@@ -10,7 +14,7 @@ public class OutputContexts {
 
     private Integer lifespanCount;
 
-    private Parameters parameters;
+    private Map<String, List<String>> parameters;
 
     @Override
     public String toString() {
@@ -33,18 +37,22 @@ public class OutputContexts {
         this.lifespanCount = lifespanCount;
     }
 
-    public Parameters getParameters() {
+    public Map getParameters() {
         return parameters;
     }
 
-    public void setParameters(Parameters parameters) {
+    public void setParameters(Map parameters) {
+        if (parameters == null) {
+            this.parameters = new HashMap<>();
+            return;
+        }
         this.parameters = parameters;
     }
 
     public static final class OutputContextsBuilder {
         private String name;
         private Integer lifespanCount;
-        private Parameters parameters;
+        private Map parameters;
 
         private OutputContextsBuilder() {
         }
@@ -63,7 +71,7 @@ public class OutputContexts {
             return this;
         }
 
-        public OutputContextsBuilder withParameters(Parameters parameters) {
+        public OutputContextsBuilder withParameters(Map parameters) {
             this.parameters = parameters;
             return this;
         }

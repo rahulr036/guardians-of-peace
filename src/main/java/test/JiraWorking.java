@@ -14,7 +14,8 @@ public class JiraWorking {
 
         RestAssured.baseURI = "https://abouthere.atlassian.net/rest/api/2"; // "https://testserver.atlassian.net/rest/api/2";
         String createIssueUrl = "/issue";
-        String searchurl = "/search?jql=".concat("assignee='rahul.ranjan@cybg.com'&fields=id,key,summary,description");
+        String searchurl = "/search?jql=".concat("assignee = currentUser() AND status NOT IN (Closed, Cancelled, Done, Completed, \"In Use\", Resolved) & &fields=id,key,summary,description");
+                        //concat("assignee=currentUser()&\"status not in\"(Closed,Cancelled,Done,Completed,\"In Use\",Resolved) '&fields=id,key,summary,description");//.concat("assignee='rahul.ranjan@cybg.com'&fields=id,key,summary,description");
 
         System.out.println("Request URL is: " + searchurl);
 
@@ -55,7 +56,7 @@ public class JiraWorking {
 
             JiraResponse jiraResponse = PeaceUtil.jsonToObject(response.prettyPrint(), JiraResponse.class);
 
-            System.out.println(jiraResponse);
+            System.out.println("There are total defect: " + jiraResponse.getTotal());
         } catch (Throwable e) {
             e.printStackTrace();
             System.err.println("Error: " + e.getMessage());

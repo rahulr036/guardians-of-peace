@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
@@ -37,9 +36,13 @@ public class PeaceController {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public ResponseEntity<WebhookResponse> processWebhookRequest(
-                    @RequestBody WebhookRequest webhookRequest,
-                    @PathParam("testVal") String testVal) {
+                    @RequestBody WebhookRequest webhookRequest) {
         LOGGER.info("Server has received a request: {}", toJson(webhookRequest));
+
+        String requestedInputParam = webhookRequest.getQueryResult().getOutputContexts()[0].getParameters().get("open-defect.original").toString();
+        String targetProduction = webhookRequest.getQueryResult().getOutputContexts()[0].getParameters().get("release.original").toString();
+
+        LOGGER.info("Requested input param is: {}, targetProduction: {}", requestedInputParam, targetProduction);
 
         String out = peaceService.getDefects("iB");
 

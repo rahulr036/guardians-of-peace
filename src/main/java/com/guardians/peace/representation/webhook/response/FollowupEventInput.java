@@ -1,8 +1,11 @@
 package com.guardians.peace.representation.webhook.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.guardians.peace.representation.webhook.Parameters;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class FollowupEventInput {
@@ -11,7 +14,7 @@ public class FollowupEventInput {
 
     private String languageCode;
 
-    private Parameters parameters;
+    private Map<String, List<String>> parameters = new HashMap<>();
 
     public String getName() {
         return name;
@@ -29,11 +32,11 @@ public class FollowupEventInput {
         this.languageCode = languageCode;
     }
 
-    public Parameters getParameters() {
+    public Map getParameters() {
         return parameters;
     }
 
-    public void setParameters(Parameters parameters) {
+    public void setParameters(Map parameters) {
         this.parameters = parameters;
     }
 
@@ -45,7 +48,7 @@ public class FollowupEventInput {
     public static final class FollowupEventInputBuilder {
         private String name;
         private String languageCode;
-        private Parameters parameters;
+        private Map parameters;
 
         private FollowupEventInputBuilder() {
         }
@@ -64,7 +67,7 @@ public class FollowupEventInput {
             return this;
         }
 
-        public FollowupEventInputBuilder withParameters(Parameters parameters) {
+        public FollowupEventInputBuilder withParameters(Map parameters) {
             this.parameters = parameters;
             return this;
         }
