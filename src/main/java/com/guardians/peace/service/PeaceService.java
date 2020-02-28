@@ -1,7 +1,9 @@
 package com.guardians.peace.service;
 
+import java.util.Map;
+
 public interface PeaceService {
 
-    String getDefects(String targetProductionRelease);
+    String getDefects(Map<String, String> requestedInputParams);
 
 }

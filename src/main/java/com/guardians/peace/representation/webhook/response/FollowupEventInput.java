@@ -14,7 +14,7 @@ public class FollowupEventInput {
 
     private String languageCode;
 
-    private Map<String, List<String>> parameters = new HashMap<>();
+    private Map<String, List<String>> parameters;
 
     public String getName() {
         return name;
@@ -37,6 +37,10 @@ public class FollowupEventInput {
     }
 
     public void setParameters(Map parameters) {
+        if (parameters == null) {
+            this.parameters = new HashMap<>();
+            return;
+        }
         this.parameters = parameters;
     }
 
@@ -67,7 +71,7 @@ public class FollowupEventInput {
             return this;
         }
 
-        public FollowupEventInputBuilder withParameters(Map parameters) {
+        public FollowupEventInputBuilder withParameters(Map<String, List<String>> parameters) {
             this.parameters = parameters;
             return this;
         }

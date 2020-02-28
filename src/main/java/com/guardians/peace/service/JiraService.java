@@ -6,7 +6,7 @@ import java.util.HashMap;
 
 public interface JiraService {
 
-    JiraResponse searchIssue(String searchUrl, HashMap<String, String> headerMap);
+    JiraResponse searchIssue(String searchUrl);
 
     void createIssue(String requestUrl, HashMap<String, String> headerMap, String body);
 

@@ -1,51 +1,40 @@
 package com.guardians.peace.service;
 
+import com.guardians.peace.exception.PeaceException;
 import com.guardians.peace.representation.jira.JiraResponse;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.Map;
 
-import java.net.URLEncoder;
-import java.util.HashMap;
-
+import static com.guardians.peace.constant.PeaceConstant.OPEN_DEFECT_QUERY;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Named
 public class PeaceServiceImpl implements PeaceService {
 
     private static final Logger LOGGER = getLogger(PeaceServiceImpl.class);
+    private static final String SORRY_MESSAGE_RESPONSE = "Sorry! I could not get the requested data for you.";
 
     @Inject
-    JiraService jiraService;
-
-    @Inject
-    private String jiraAuthorizationToken;
+    private JiraService jiraService;
 
     @Override
-    public String getDefects(String targetProductionRelease) {
-        //"assignee='rahul.ranjan@cybg.com'&fields=id,key,summary,description"
-        String jiraRequestUrlParam = "assignee='rahul.ranjan@cybg.com'&startAt=1&maxResults=10&fields=id,key,summary,description";
-
-        HashMap<String, String> headerMap = new HashMap<String, String>();
-        headerMap.put("Content-Type", "application/json");
-        headerMap.put("Authorization", jiraAuthorizationToken);
-
-        JiraResponse jiraResponse = jiraService.searchIssue(jiraRequestUrlParam, headerMap);
-
-        //project = "iB Payments" AND "Target Production Release" = "iB18c - 2019" and status not in (closed,"SIT Deployment",Completed,"E2E / UAT","ready for tat deployment","deployed to tat","Deployed to Prod","TAT retest","TAT Testing","SIT retest","Ready for SIT Deployment","Ready for Prod Deployment",Cancelled,"Ready for INT deployment","INT retest","QA")
-        String searchurl = "https://abouthere.atlassian.net/rest/api/2/search?jql=assignee='rahul.ranjan@cybg.com'&type=Defect&fields=id,key,summary,description,'Target Production Release'";
-        return jiraResponse.getTotal().toString();
-    }
-
-    private String getUrl() {
-        try {
-           String out =  URLEncoder.encode("iB Payments\" AND \"Target Production Release\" = \"iB18c - 2019\" and status not in (closed,\"SIT Deployment\",Completed,\"E2E / UAT\",\"ready for tat deployment\",\"deployed to tat\",\"Deployed to Prod\",\"TAT retest\",\"TAT Testing\",\"SIT retest\",\"Ready for SIT Deployment\",\"Ready for Prod Deployment\",Cancelled,\"Ready for INT deployment\",\"INT retest\",\"QA\")", "UTF-8");
-           System.out.println(out);
-        } catch (Exception e) {
-            e.printStackTrace();
+    public String getDefects(Map<String, String> requestedInputParams) {
+        String openDefect = requestedInputParams.get("open-defect.original");
+        String targetProduction = requestedInputParams.get("release.original");
+        LOGGER.debug("Fetching defect from Jira with requested param as openDefect: {}, targetProduction: {}", openDefect, targetProduction);
+        if (isBlank(openDefect)) {
+            return SORRY_MESSAGE_RESPONSE;
         }
-        return null;
+        String jiraRequestUrlParam = OPEN_DEFECT_QUERY.replace("TARGET_PRODUCTION_VALUE", targetProduction);
+        try {
+            JiraResponse jiraResponse = jiraService.searchIssue(jiraRequestUrlParam);
+            return "There are " +  jiraResponse.getTotal().toString() + " defects as of now";
+        } catch (PeaceException e) {
+            return SORRY_MESSAGE_RESPONSE;
+        }
     }
-
 }

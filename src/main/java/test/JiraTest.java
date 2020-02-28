@@ -8,7 +8,7 @@ import com.jayway.restassured.response.Response;
 import java.util.Base64;
 import java.util.HashMap;
 
-public class JiraWorking {
+public class JiraTest {
 
     public static void main(String[] args) {
 
