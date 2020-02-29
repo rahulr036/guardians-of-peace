@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.HashMap;
+import java.util.Map;
 
 import static com.guardians.peace.util.PeaceUtil.jsonToObject;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -17,6 +18,10 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class JiraServiceImpl implements JiraService {
 
     private static final Logger LOGGER = getLogger(JiraServiceImpl.class);
+    private static final String CONTENT_TYPE = "Content-Type";
+    private static final String APPLICATION_JSON_CONTENT_TYPE = "application/json";
+    private static final String AUTHORIZATION = "Authorization";
+
     private static final String SEARCH_PARAM_PREFIX = "/search?jql=";
 
     @Inject
@@ -26,16 +31,13 @@ public class JiraServiceImpl implements JiraService {
     private String jiraAuthorizationToken;
 
     @Override
-    public JiraResponse searchIssue(String searchUrl, HashMap<String, String> headerMap) {
+    public JiraResponse searchIssue(String searchUrl) {
         LOGGER.info("Sending the request to Jira with search URL parameter: {}", searchUrl);
-        LOGGER.info("jiraBaseUrl: {}, jiraAuthorizationToken: {}", jiraBaseUrl, jiraAuthorizationToken);
         try {
             RestAssured.baseURI = jiraBaseUrl;
-            Response response = RestAssured.given().log().all().headers(headerMap).get(SEARCH_PARAM_PREFIX.concat(searchUrl));
+            Response response = RestAssured.given().log().all().headers(buildHeaders()).get(SEARCH_PARAM_PREFIX.concat(searchUrl));
 
-            JiraResponse jiraResponse = jsonToObject(response.prettyPrint(), JiraResponse.class);
-            LOGGER.debug("Received response from Jira is: {}", jiraResponse);
-            return jiraResponse;
+            return jsonToObject(response.prettyPrint(), JiraResponse.class);
         } catch (Exception e) {
             throw new PeaceException("Failed to fetch the response from Jira API with error: " + e.getMessage(), e);
         }
@@ -52,5 +54,13 @@ public class JiraServiceImpl implements JiraService {
         } catch (Exception e) {
             throw new PeaceException("Failed to create new issue on Jira API with error: " + e.getMessage(), e);
         }
+    }
+
+    private Map<String, String> buildHeaders() {
+        HashMap<String, String> headerMap = new HashMap<>();
+        headerMap.put(CONTENT_TYPE, APPLICATION_JSON_CONTENT_TYPE);
+        headerMap.put(AUTHORIZATION, jiraAuthorizationToken);
+
+        return headerMap;
     }
 }

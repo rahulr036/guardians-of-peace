@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -14,7 +13,7 @@ public class OutputContexts {
 
     private Integer lifespanCount;
 
-    private Map<String, List<String>> parameters;
+    private Map<String, String> parameters;
 
     @Override
     public String toString() {

@@ -15,8 +15,8 @@ import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.util.Map;
 
-import static com.guardians.peace.util.PeaceUtil.toJson;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @RestController
@@ -37,16 +37,14 @@ public class PeaceController {
     @Consumes(MediaType.APPLICATION_JSON)
     public ResponseEntity<WebhookResponse> processWebhookRequest(
                     @RequestBody WebhookRequest webhookRequest) {
-        LOGGER.info("Server has received a request: {}", toJson(webhookRequest));
+        LOGGER.info("Server has received a request: {}", webhookRequest);
 
-        String requestedInputParam = webhookRequest.getQueryResult().getOutputContexts()[0].getParameters().get("open-defect.original").toString();
-        String targetProduction = webhookRequest.getQueryResult().getOutputContexts()[0].getParameters().get("release.original").toString();
+        Map<String, String> requestedInputParams = webhookRequest.getQueryResult().getOutputContexts()[0].getParameters();
+        LOGGER.info("Requested input param is: {}", requestedInputParams);
 
-        LOGGER.info("Requested input param is: {}, targetProduction: {}", requestedInputParam, targetProduction);
+        String outputMessage = peaceService.getDefects(requestedInputParams);
 
-        String out = peaceService.getDefects("iB");
-
-        WebhookResponse response = webhookResponseBuilder.buildWebhookResponse("There are " + out + " defects as of now");
+        WebhookResponse response = webhookResponseBuilder.buildWebhookResponse(outputMessage);
 
         LOGGER.info("Sending response after processing the webhook request");
         return ResponseEntity.accepted().body(response);
