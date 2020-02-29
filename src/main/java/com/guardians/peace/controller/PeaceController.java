@@ -24,7 +24,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class PeaceController {
 
     private static final Logger LOGGER = getLogger(PeaceController.class);
-    private static final String URL_GET_JIRA_REPORT = "/report/jira";
+    private static final String URL_GET_JIRA_REPORT = "/report/jira/opendefect";
+    private static final String URL_CREATE_STORY_DETAILS = "/report/jira/createstory";
 
     @Inject
     private PeaceService peaceService;
@@ -35,14 +36,33 @@ public class PeaceController {
     @PostMapping(URL_GET_JIRA_REPORT)
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public ResponseEntity<WebhookResponse> processWebhookRequest(
+    public ResponseEntity<WebhookResponse> getOpenDefect(
                     @RequestBody WebhookRequest webhookRequest) {
         LOGGER.info("Server has received a request: {}", webhookRequest);
 
         Map<String, String> requestedInputParams = webhookRequest.getQueryResult().getOutputContexts()[0].getParameters();
         LOGGER.info("Requested input param is: {}", requestedInputParams);
 
-        String outputMessage = peaceService.getDefects(requestedInputParams);
+        String outputMessage = peaceService.getOpenDefects(requestedInputParams);
+
+        WebhookResponse response = webhookResponseBuilder.buildWebhookResponse(outputMessage);
+
+        LOGGER.info("Sending response after processing the webhook request");
+        return ResponseEntity.accepted().body(response);
+
+    }
+
+    @PostMapping(URL_CREATE_STORY_DETAILS)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public ResponseEntity<WebhookResponse> getDefectDetails(
+                    @RequestBody WebhookRequest webhookRequest) {
+        LOGGER.info("Server has received a request: {}", webhookRequest);
+
+        Map<String, String> requestedInputParams = webhookRequest.getQueryResult().getOutputContexts()[0].getParameters();
+        LOGGER.info("Requested input param is: {}", requestedInputParams);
+
+        String outputMessage = peaceService.createIssue(requestedInputParams);
 
         WebhookResponse response = webhookResponseBuilder.buildWebhookResponse(outputMessage);
 
