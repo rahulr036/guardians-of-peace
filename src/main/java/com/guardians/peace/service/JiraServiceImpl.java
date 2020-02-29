@@ -1,6 +1,7 @@
 package com.guardians.peace.service;
 
 import com.guardians.peace.exception.PeaceException;
+import com.guardians.peace.representation.jira.CreateJiraResponse;
 import com.guardians.peace.representation.jira.JiraResponse;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.response.Response;
@@ -23,6 +24,7 @@ public class JiraServiceImpl implements JiraService {
     private static final String AUTHORIZATION = "Authorization";
 
     private static final String SEARCH_PARAM_PREFIX = "/search?jql=";
+    private static final String CREATE_ISSUE_URL = "/issue";
 
     @Inject
     private String jiraBaseUrl;
@@ -44,13 +46,14 @@ public class JiraServiceImpl implements JiraService {
     }
 
     @Override
-    public void createIssue(String requestUrl, HashMap<String, String> headerMap, String body) {
+    public CreateJiraResponse createIssue(String body) {
         LOGGER.info("Creating new issue on Jira");
         Response response;
         try {
             RestAssured.baseURI = jiraBaseUrl;
-            response = RestAssured.given().log().all().headers(headerMap).body(body).post(requestUrl);
-            response.prettyPrint();
+            response = RestAssured.given().log().all().headers(buildHeaders()).body(body).post(CREATE_ISSUE_URL);
+            LOGGER.info("created issue: {}", response.prettyPrint());
+            return jsonToObject(response.prettyPrint(), CreateJiraResponse.class);
         } catch (Exception e) {
             throw new PeaceException("Failed to create new issue on Jira API with error: " + e.getMessage(), e);
         }
