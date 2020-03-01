@@ -38,11 +38,11 @@ public class JiraTest {
         String createPaylod = "{\"fields\":{\"project\":{\"key\":\"IBP\"},\"summary\":\"Test REST API for creating an Story\",\"description\":\"Creating an issue\",\"assignee\":{\"name\":\"currentUser()\"},\"issuetype\":{\"name\":\"Story\"},\"priority\":{\"name\":\"Minor\"},\"customfield_10101\":{\"name\":\"Feature Team\",\"value\":\"Paymates\"}}}";
         //String createPaylod = "{\"fields\":{\"project\":{\"key\":\"IBP\"},\"summary\":\"Creating a subtask\",\"description\":\"Creating an issue\",\"issuetype\":{\"name\":\"Sub-task\"},\"priority\":{\"name\":\"Minor\"},\"customfield_10101\":{\"name\":\"Feature Team\",\"value\":\"Paymates\"}, \"parent\":{\"key\":\"IBP-3895\"}}}";
 
-       // searchIssue(searchurl, headerMap);
+        searchIssue(searchurl, headerMap);
         //createIssue(createIssueUrl, headerMap, createPaylod);
 
         String updateIssueUrl = "/issue/IBP-3895";
-        String updatePayload = "{ \"update\": { \"Assignee\": [ {\"Set\": \"rahul.ranjan@cybg.com\"} ] } }";
+        String updatePayload = "{\"update\": {\"comment\": [{\"add\": {\"body\": \"Task is still in progress.\"}}]}}";
         updateIssue(updateIssueUrl, headerMap, updatePayload);
 
     }
@@ -75,7 +75,7 @@ public class JiraTest {
         Response response = null;
         try {
             response = RestAssured.given().log().all().headers(headerMap).body(body).put(url);
-            response.prettyPrint();
+            System.out.println(response.prettyPrint());
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
         }

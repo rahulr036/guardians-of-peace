@@ -25,6 +25,7 @@ public class JiraServiceImpl implements JiraService {
 
     private static final String SEARCH_PARAM_PREFIX = "/search?jql=";
     private static final String CREATE_ISSUE_URL = "/issue";
+    private static final String UPDATE_ISSUE_URL = "/issue/{ISSUE_NUMBER}";
 
     @Inject
     private String jiraBaseUrl;
@@ -56,6 +57,19 @@ public class JiraServiceImpl implements JiraService {
             return jsonToObject(response.prettyPrint(), CreateJiraResponse.class);
         } catch (Exception e) {
             throw new PeaceException("Failed to create new issue on Jira API with error: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void updateJira(String comment, String issueNumber) {
+        LOGGER.info("Updating jira {} with new comment: {}", issueNumber, comment);
+        String url = UPDATE_ISSUE_URL.replace("{ISSUE_NUMBER}", issueNumber);
+        String updatePayload = "{\"update\": {\"comment\": [{\"add\": {\"body\": \"REQUESTED_COMMENT\"}}]}}";
+        updatePayload = updatePayload.replace("REQUESTED_COMMENT", comment);
+        try {
+            RestAssured.given().log().all().headers(buildHeaders()).body(updatePayload).put(url);
+        } catch (Exception e) {
+            throw new PeaceException("Failed to update comment on Jira API with error: " + e.getMessage(), e);
         }
     }
 

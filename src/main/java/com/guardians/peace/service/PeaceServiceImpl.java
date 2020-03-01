@@ -10,14 +10,13 @@ import javax.inject.Named;
 import java.util.Map;
 
 import static com.guardians.peace.constant.PeaceConstant.OPEN_DEFECT_QUERY;
-import static org.apache.commons.lang3.StringUtils.isBlank;
+import static com.guardians.peace.constant.PeaceConstant.SORRY_MESSAGE_RESPONSE;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Named
 public class PeaceServiceImpl implements PeaceService {
 
     private static final Logger LOGGER = getLogger(PeaceServiceImpl.class);
-    private static final String SORRY_MESSAGE_RESPONSE = "Sorry! I could not get the requested data for you.";
 
     @Inject
     private JiraService jiraService;
@@ -28,23 +27,27 @@ public class PeaceServiceImpl implements PeaceService {
         String openDefect = requestedInputParams.get("open-defect.original");
         String targetProduction = requestedInputParams.get("release.original");
         LOGGER.debug("Fetching defect from Jira with requested param as openDefect: {}, targetProduction: {}", openDefect, targetProduction);
-        if (isBlank(openDefect)) {
-            return SORRY_MESSAGE_RESPONSE;
-        }
+
         String jiraRequestUrlParam = OPEN_DEFECT_QUERY.replace("TARGET_PRODUCTION_VALUE", targetProduction);
         try {
             JiraResponse jiraResponse = jiraService.searchIssue(jiraRequestUrlParam);
-            return "There are " +  jiraResponse.getTotal().toString() + " defects as of now";
+            return "There are " + jiraResponse.getTotal().toString() + " defects as of now";
         } catch (PeaceException e) {
             return SORRY_MESSAGE_RESPONSE;
         }
     }
 
     @Override
-    public String getJiraDetails(Map<String, String> requestedInputParams) {
-        LOGGER.info("Getting the details of the defect");
+    public String updateIssue(Map<String, String> requestedInputParams) {
+        String issueNumber = requestedInputParams.get("issue-number.original");
+        String comment = requestedInputParams.get("comment.original");
 
-        return null;
+        try {
+            jiraService.updateJira(comment, issueNumber);
+            return "Jira has been updated successfully";
+        } catch (PeaceException e) {
+            return SORRY_MESSAGE_RESPONSE;
+        }
     }
 
     @Override
@@ -52,7 +55,9 @@ public class PeaceServiceImpl implements PeaceService {
         String issueType = requestedInputParams.get("create-story.original");
         LOGGER.info("Creating a jira of issue type: {}", issueType);
 
-        String createPaylod = "{\"fields\":{\"project\":{\"key\":\"IBP\"},\"summary\":\"Test REST API for creating an Story\",\"description\":\"Creating an story\",\"issuetype\":{\"name\":\"Story\"},\"priority\":{\"name\":\"Minor\"},\"customfield_10101\":{\"name\":\"Feature Team\",\"value\":\"Paymates\"}}}";
+        String createPaylod =
+                        "{\"fields\":{\"project\":{\"key\":\"IBP\"},\"summary\":\"Test REST API for creating an Story\",\"description\":\"Creating an story\",\"issuetype\":{\"name\":\"INPUT_ISSUE_TYPE\"},\"priority\":{\"name\":\"Minor\"},\"customfield_10101\":{\"name\":\"Feature Team\",\"value\":\"Paymates\"}}}";
+        createPaylod = createPaylod.replace("INPUT_ISSUE_TYPE", issueType);
         CreateJiraResponse response = jiraService.createIssue(createPaylod);
         return "Successfully created user story with id: " + response.getKey();
     }
