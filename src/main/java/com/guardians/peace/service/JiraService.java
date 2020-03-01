@@ -9,4 +9,6 @@ public interface JiraService {
 
     CreateJiraResponse createIssue(String body);
 
+    void updateJira(String comment, String issueNumber);
+
 }
